@@ -1,8 +1,7 @@
 package nl.wwbakker.dialogue.model.events
 
-import java.util.UUID
-
 import nl.wwbakker.dialogue.model.Assertion
+import nl.wwbakker.dialogue.model.ids.{AssertionId, RelationId}
 import nl.wwbakker.dialogue.model.relation.Relation
 import play.api.libs.json.{Json, OFormat}
 
@@ -15,20 +14,21 @@ case class AssertionAdded(assertion: Assertion) extends Event
 // Validation:
 // - fromAssertion exists
 // - relation.relatedToAssertion exists
-case class RelationAdded(fromAssertion: UUID,
+case class RelationAdded(fromAssertion: AssertionId,
                          relation: Relation) extends Event
 
 // Validation:
 // - relationId exists
-case class RelationInvalidated(relationId: UUID) extends Event
+case class RelationInvalidated(relationId: RelationId) extends Event
 
 // Validation:
 // - supersededAssertion exists
-case class AssertionSuperseded(supersededAssertion: UUID,
-                               newAssertion: Assertion) extends Event
+case class AssertionSuperseded(supersededAssertion: AssertionId,
+                               newAssertion: Assertion,
+                               incorporatedAssertions: Seq[AssertionId]) extends Event
 
 // Result of invalidates relation (geen actie)
-case class AssertionInvalidated(invalidatedAssertion: UUID) extends Event
+case class AssertionInvalidated(invalidatedAssertion: AssertionId) extends Event
 
 object Event {
   implicit val assertionAddedFormat: OFormat[AssertionAdded] = Json.format[AssertionAdded]
