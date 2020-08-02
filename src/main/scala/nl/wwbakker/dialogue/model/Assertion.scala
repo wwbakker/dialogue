@@ -1,7 +1,12 @@
 package nl.wwbakker.dialogue.model
 
 import java.util.UUID
-import nl.wwbakker.dialogue.model.relation.Relation
 
-opaque type AssertionId = UUID
-case class Assertion(id : AssertionId, text: String, relatesTo: List[Relation])
+import nl.wwbakker.dialogue.model.relation.Relation
+import play.api.libs.json.{Json, OFormat}
+
+case class Assertion(id : UUID, text: String, relatesTo: List[Relation])
+
+object Assertion {
+  implicit val assertionFormat : OFormat[Assertion] = Json.format[Assertion]
+}
