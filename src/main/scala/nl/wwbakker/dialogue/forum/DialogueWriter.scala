@@ -1,38 +1,42 @@
 package nl.wwbakker.dialogue.forum
 
+import nl.wwbakker.dialogue.forum.persistence.PersistenceHandler
 import nl.wwbakker.dialogue.model.Assertion
-import nl.wwbakker.dialogue.model.events.{AssertionAdded, AssertionSuperseded, Event}
+import nl.wwbakker.dialogue.model.events.{AssertionAdded, AssertionSuperseded}
 import nl.wwbakker.dialogue.model.ids.AssertionId
-import play.api.libs.json.Json
+import nl.wwbakker.dialogue.model.relation.{Relation, RelationType, Supersedes}
 
-import scala.util.Try
-
-class DialogueWriter(forum: Forum) {
-
-  case class WriteSuccess()
-
+class DialogueWriter(forum: Forum, persistenceHandler: PersistenceHandler) {
+  type WriteSuccess = ()
   type ErrorMessage = String
 
-  def addAssertion(assertion: Assertion): Either[ErrorMessage, WriteSuccess] = {
+  def addAssertion(text: String, relatesTo: AssertionId, relationType: RelationType): Either[ErrorMessage, WriteSuccess] = {
+    val newAssertion = Assertion(
+      id = forum.generateAssertionId(),
+      text = text,
+      relatesTo = List(
+        Relation(forum.generateRelationId(), relatesTo, relationType)
+      )
+    )
     for {
-      _ <- Validator.validateAssertionConnected(forum, assertion).toLeft()
-      success <- write(AssertionAdded(assertion))
+      success <- persistenceHandler.write(AssertionAdded(newAssertion))
     } yield success
   }
 
   def supersedeAssertion(oldAssertion: AssertionId,
-                         newAssertion: Assertion,
+                         text: String,
                          incorporatedAssertions : Seq[AssertionId]): Either[ErrorMessage, WriteSuccess] = {
+    val newAssertion = Assertion(
+      id = forum.generateAssertionId(),
+      text = text,
+      relatesTo = List(
+        Relation(forum.generateRelationId(), oldAssertion, Supersedes)
+      )
+    )
     for {
       _ <- Validator.validateAssertionExists(forum, oldAssertion).toLeft()
       _ <- Validator.validateAssertionIsNotAlreadySuperseded(forum, oldAssertion).toLeft()
-      success <- write(AssertionSuperseded(oldAssertion, newAssertion, incorporatedAssertions))
+      success <- persistenceHandler.write(AssertionSuperseded(oldAssertion, newAssertion, incorporatedAssertions))
     } yield success
-  }
-
-  def write(e: Event) : Either[ErrorMessage, WriteSuccess] = {
-    Try(System.out.println(Json.stringify(Json.toJson(e)))).toEither
-      .swap.map(_.toString).swap
-      .map(_ => WriteSuccess())
   }
 }
