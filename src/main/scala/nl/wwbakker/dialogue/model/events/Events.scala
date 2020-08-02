@@ -31,10 +31,10 @@ case class AssertionSuperseded(supersededAssertion: UUID,
 case class AssertionInvalidated(invalidatedAssertion: UUID) extends Event
 
 object Event {
-  private implicit val assertionAddedFormat: OFormat[AssertionAdded] = Json.format[AssertionAdded]
-  private implicit val relationAddedFormat: OFormat[RelationAdded] = Json.format[RelationAdded]
-  private implicit val relationInvalidatedFormat: OFormat[RelationInvalidated] = Json.format[RelationInvalidated]
-  private implicit val assertionSupersededFormat: OFormat[AssertionSuperseded] = Json.format[AssertionSuperseded]
-  private implicit val assertionInvalidatedFormat: OFormat[AssertionInvalidated] = Json.format[AssertionInvalidated]
+  implicit val assertionAddedFormat: OFormat[AssertionAdded] = Json.format[AssertionAdded]
+  implicit val relationAddedFormat: OFormat[RelationAdded] = Json.format[RelationAdded]
+  implicit val relationInvalidatedFormat: OFormat[RelationInvalidated] = Json.format[RelationInvalidated]
+  implicit val assertionSupersededFormat: OFormat[AssertionSuperseded] = Json.format[AssertionSuperseded]
+  implicit val assertionInvalidatedFormat: OFormat[AssertionInvalidated] = Json.format[AssertionInvalidated]
   implicit val eventFormat : OFormat[Event] = Json.format[Event]
 }
