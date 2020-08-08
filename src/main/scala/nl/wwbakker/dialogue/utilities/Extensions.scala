@@ -10,14 +10,14 @@ object Extensions {
       r.reads(JsString(s)).asEither.swap.map(_.head._2.head.message).swap
   }
 
-  implicit class ParseSeqExtensions[A, B](s : Seq[A]) {
+  implicit class SeqOperationExtensions[A, B](s : Seq[A]) {
     /**
-     * Extension to convert a function that parses 1 value, into a function that converts a list of values, but combines the error message
+     * Extension to convert a function that applies an operation to 1 value, into a function that maps over a list of values, but combines the error message
      */
-    def parseList(fn: A => Either[ErrorMessage, B]) : Either[ErrorMessage, Seq[B]] = {
+    def applyList(fn: A => Either[ErrorMessage, B]) : Either[ErrorMessage, Seq[B]] = {
       val results = s.zip(s.map(fn))
       val errors = results.collect {
-        case (inputValue, Left(errorMessage)) => s"$inputValue -> errorMessage"
+        case (inputValue, Left(errorMessage)) => s"$inputValue -> $errorMessage"
       }
       if (errors.isEmpty)
         Right(results.collect {

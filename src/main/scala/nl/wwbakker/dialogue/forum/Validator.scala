@@ -20,12 +20,12 @@ object Validator {
     if (forum.assertions.exists(_.id == assertionId))
       None
     else
-      Some(s"Assertion with id '${assertionId}' doesn't exist")
+      Some(s"Assertion '$assertionId' doesn't exist")
 
   def validateAssertionIsNotAlreadySuperseded(forum : Forum, assertionId : AssertionId) : Option[ErrorMessage] =
-    if (forum.assertions.filter(_.id == assertionId)
+    if (forum.assertions
       .exists(_.relatesTo.exists(_.relationType == Supersedes)))
-      Some(s"Assertion with id '${assertionId} is already superseded")
+      Some(s"Assertion '$assertionId' is already superseded")
     else
       None
 

@@ -21,7 +21,7 @@ object Main {
           case "supersede-assertion" :: supersededAssertionIdString :: text :: incorporatedIdsStrings =>
             for {
               supersededAssertionId <- AssertionId.format.parseFromString(supersededAssertionIdString)
-              incorporatedIds <- incorporatedIdsStrings.parseList(AssertionId.format.parseFromString)
+              incorporatedIds <- incorporatedIdsStrings.applyList(AssertionId.format.parseFromString)
               assertionResult <- dw.supersedeAssertion(supersededAssertionId, text, incorporatedIds)
             } yield assertionResult
           case _ =>

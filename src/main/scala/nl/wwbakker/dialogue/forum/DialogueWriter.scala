@@ -5,6 +5,7 @@ import nl.wwbakker.dialogue.model.{Assertion, SuccessOperation}
 import nl.wwbakker.dialogue.model.events.{AssertionAdded, AssertionSuperseded}
 import nl.wwbakker.dialogue.model.ids.AssertionId
 import nl.wwbakker.dialogue.model.relation.{Relation, RelationType, Supersedes}
+import nl.wwbakker.dialogue.utilities.Extensions._
 
 class DialogueWriter(forum: Forum, persistenceHandler: PersistenceHandler) {
   type ErrorMessage = String
@@ -47,6 +48,7 @@ class DialogueWriter(forum: Forum, persistenceHandler: PersistenceHandler) {
     for {
       _ <- Validator.validateAssertionExists(forum, oldAssertion).toLeft(SuccessOperation)
       _ <- Validator.validateAssertionIsNotAlreadySuperseded(forum, oldAssertion).toLeft(SuccessOperation)
+      _ <- incorporatedAssertions.applyList(aid => Validator.validateAssertionExists(forum, aid).toLeft(SuccessOperation))
       success <- persistenceHandler.write(AssertionSuperseded(oldAssertion, newAssertion, incorporatedAssertions))
     } yield success
   }
