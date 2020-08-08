@@ -12,13 +12,18 @@ class Forum(initialEvents : Seq[Event]) {
   }
   def topic : Option[Assertion] = assertions.headOption
 
-  private var previousAssertionId = assertions.lastOption.map(_.id.value).getOrElse(0)
+  private var previousAssertionId =
+    assertions.lastOption
+    .map(_.id.value).getOrElse(0)
   def generateAssertionId(): AssertionId = {
     previousAssertionId += 1
     AssertionId(previousAssertionId)
   }
 
-  private var previousRelationId = assertions.lastOption.flatMap(_.relatesTo).foldLeft(0)((a, b) => Math.max(a, b.relationId.value))
+  private var previousRelationId =
+    assertions.lastOption.toList
+      .flatMap(_.relatesTo)
+      .foldLeft(0)((a, b) => Math.max(a, b.relationId.value))
   def generateRelationId(): RelationId = {
     previousRelationId += 1
     RelationId(previousRelationId)
