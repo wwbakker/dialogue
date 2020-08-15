@@ -15,6 +15,7 @@ class Forum(initialEvents : Seq[Event]) {
   private var previousAssertionId =
     assertions.lastOption
     .map(_.id.value).getOrElse(0)
+
   def generateAssertionId(): AssertionId = {
     previousAssertionId += 1
     AssertionId(previousAssertionId)
@@ -24,6 +25,7 @@ class Forum(initialEvents : Seq[Event]) {
     assertions.lastOption.toList
       .flatMap(_.relatesTo)
       .foldLeft(0)((a, b) => Math.max(a, b.relationId.value))
+
   def generateRelationId(): RelationId = {
     previousRelationId += 1
     RelationId(previousRelationId)

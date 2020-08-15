@@ -1,6 +1,7 @@
 lazy val root = (project in file(".")).
   settings(
     resolvers += Resolver.url("typesafe", url("https://repo.typesafe.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns),
+    resolvers += Resolver.JCenterRepository,
 
     scalaVersion := "2.13.3",
     scalacOptions ++= Seq("-deprecation"),
@@ -8,4 +9,5 @@ lazy val root = (project in file(".")).
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.0",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test",
     libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.7.1",
+    libraryDependencies += "net.katsstuff" %% "ackcord" % "0.16.1",
   )

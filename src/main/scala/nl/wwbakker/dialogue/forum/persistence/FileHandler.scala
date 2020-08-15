@@ -1,6 +1,6 @@
 package nl.wwbakker.dialogue.forum.persistence
 
-import nl.wwbakker.dialogue.model.SuccessOperation
+import nl.wwbakker.dialogue.model.SuccessOperationWithoutMessage
 import nl.wwbakker.dialogue.model.events.Event
 import os.Path
 import play.api.libs.json.Json
@@ -11,10 +11,10 @@ class FileHandler extends PersistenceHandler {
 
   val path: Path = os.home / ".dialogue" / "history"
 
-  override def write(e: Event) : Either[ErrorMessage, SuccessOperation.type] =
+  override def write(e: Event) : Either[ErrorMessage, SuccessOperationWithoutMessage.type] =
     Try(os.write.append(target = path, data = Json.stringify(Json.toJson(e)) + System.lineSeparator(), createFolders = true)).toEither
       .swap.map(_.toString).swap
-      .map(_ => SuccessOperation)
+      .map(_ => SuccessOperationWithoutMessage)
 
 
   override def read() : Either[ErrorMessage, Seq[Event]] = {
