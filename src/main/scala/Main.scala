@@ -9,7 +9,7 @@ object Main {
       case Some("run-discord") =>
         DiscordServer.start()
       case _ =>
-        val result = CommandHandler.handleCommand(args, "java -jar dialogue.jar")
+        val result = CommandHandler.handleCommand(args.toIndexedSeq, "java -jar dialogue.jar")
         System.err.println("dialogue usage:")
         result match {
           case Left(value) => System.err.println(value)

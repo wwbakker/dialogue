@@ -24,7 +24,7 @@ object Validator {
 
   def validateAssertionIsNotAlreadySuperseded(forum : Forum, assertionId : AssertionId) : Option[ErrorMessage] =
     if (forum.assertions
-      .exists(_.relatesTo.exists(_.relationType == Supersedes)))
+      .exists(_.relatesTo.exists(a => a.relationType == Supersedes && a.relatedToAssertion == assertionId)))
       Some(s"Assertion '$assertionId' is already superseded")
     else
       None

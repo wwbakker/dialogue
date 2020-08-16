@@ -26,12 +26,12 @@ object CommandHandler {
             assertionResult <- dw.supersedeAssertion(supersededAssertionId, text, incorporatedIds)
           } yield assertionResult
         case "list" :: Nil =>
-          Right(SuccessOperationWithMessage(forum.topic.map(_.text).getOrElse("No topic")))
+          Right(SuccessOperationWithMessage(forum.topicWithHistoryFormatted))
         case _ =>
           Left(
-            s"""$commandPrefix [new-assertion] [text]
-              |$commandPrefix [add-assertion] [other-assertion-id] [other-assertion-relation-type] [text]
-              |$commandPrefix [supersede-assertion] [superseded-assertion-id] [text] [incorporated-assertion-ids, 0 or more]""".stripMargin
+            s"""$commandPrefix new-assertion [text]
+              |$commandPrefix add-assertion [other-assertion-id] [Supports/Invalidates/Detracts/Explains] [text]
+              |$commandPrefix supersede-assertion [superseded-assertion-id] [text] [incorporated-assertion-ids, 0 or more]""".stripMargin
           )
       }
     }

@@ -2,7 +2,9 @@ package nl.wwbakker.dialogue.model.relation
 
 import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue, Json}
 
-sealed trait RelationType
+sealed trait RelationType {
+  def name : String = this.getClass.getSimpleName.replace("$", "")
+}
 case object Supports extends RelationType
 case object Invalidates extends RelationType
 case object Detracts extends RelationType
@@ -11,6 +13,8 @@ case object Explains extends RelationType
 
 object RelationType {
   type ErrorMessage = String
+
+  def all = Seq(Invalidates, Supports, Detracts, Explains, Supersedes)
 
   implicit object RelationTypeFormatter extends Format[RelationType] {
     override def reads(json: JsValue): JsResult[RelationType] = json match {

@@ -1,6 +1,6 @@
 package nl.wwbakker.dialogue.model
 
-trait SuccessOperation {
+sealed trait SuccessOperation {
   def alwaysText : String
 }
 

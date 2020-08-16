@@ -2,17 +2,17 @@ package nl.wwbakker.dialogue.discord
 
 import java.util.Base64
 
-import os.Path
 import ackcord._
-import ackcord.commands.CommandController
 import ackcord.data._
-import ackcord.requests.{CreateMessage, CreateMessageData}
+import ackcord.requests.{CreateMessage, CreateMessageData, CreateReaction, Request}
 import cats.implicits.catsStdInstancesForFuture
 import nl.wwbakker.dialogue.forum.CommandHandler
 import nl.wwbakker.dialogue.model.{SuccessOperationWithMessage, SuccessOperationWithoutMessage}
+import os.Path
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 
 object DiscordServer {
@@ -57,31 +57,32 @@ object DiscordServer {
       content.replaceAll("<@![0-9]+> ","")
 
     lazy val registration = client.onEventSideEffects { implicit c => {
-      case APIMessage.MessageCreate(message, _) if message.content != "stop" =>
-        println(s"message: ${message.content} - ${message.mentions.mkString(", ")}" )
-        if (message.mentions.contains(clientId)) {
-          val result = CommandHandler.handleCommand(removeMentions(message.content)
-            .split(" (?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)").map(stripQuotes),
-            "@Wessel's Bot")
-          val responseMessage = result match {
-            case Left(errorMessage) => errorMessage
-            case Right(SuccessOperationWithoutMessage) => "success"
-            case Right(SuccessOperationWithMessage(text)) => text
-          }
-          val response = CreateMessage(message.channelId, params = CreateMessageData(responseMessage))
-          client.requestsHelper.run(response).map(_ => ())
-        }
       case APIMessage.MessageCreate(message, _) if message.content.contains("stop bot") =>
         println("stopping")
         stop()
         client.logout()
+        client.shutdownAckCord()
+      case APIMessage.MessageCreate(message, _) =>
+        println(s"message: ${message.content} - ${message.mentions.mkString(", ")}" )
+        if (message.mentions.contains(clientId)) {
+          val result = CommandHandler.handleCommand(removeMentions(message.content)
+            .split(" (?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)").toIndexedSeq.map(stripQuotes),
+            "@Wessel's Bot")
+          result match {
+            case Left(errorMessage) => send(CreateMessage(message.channelId, CreateMessageData(errorMessage)))
+            case Right(SuccessOperationWithoutMessage) => send(CreateReaction(message.channelId, message.id, "\uD83D\uDC4D"))
+            case Right(SuccessOperationWithMessage(text)) => send(CreateMessage(message.channelId, CreateMessageData(text)))
+          }
+        }
     }
     }
+
+    def send[A](request : Request[A])(implicit c: CacheSnapshot) : Unit =
+      client.requestsHelper.run(request).map(_ => ())
 
     def stop() : Unit = registration.stop()
 
     registration
-
     client.login()
   }
 
